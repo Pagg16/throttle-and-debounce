@@ -19,9 +19,13 @@ function debounce(fn, delay) {
 
 function throttle(fn, delay) {
   let isWaiting = false;
-  
-  return function (...args) {
+  let propsArgs = null;
+  let propsThis = null;
+
+  return function wrapper(...args) {
     if (isWaiting) {
+      propsArgs = args;
+      propsThis = this;
       return;
     }
     fn.apply(this, args);
@@ -29,6 +33,11 @@ function throttle(fn, delay) {
 
     setTimeout(() => {
       isWaiting = false;
+      if (propsThis) {
+        wrapper.apply(propsThis, propsArgs);
+        propsArgs = null;
+        propsThis = null;
+      }
     }, delay);
   };
 }
